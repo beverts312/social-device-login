@@ -1,8 +1,10 @@
 import express = require('express');
 import FacebookWrapper = require('./fb/fb');
+import TwitterWrapper = require('./twitter/twitter');
 
 const app = express();
 const fb = new FacebookWrapper();
+const twitter = new TwitterWrapper();
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -26,6 +28,21 @@ app.get('/facebook', (req, res) => {
     });
   }).catch((err) => {
     console.error('failed to auth application');
+    res.status(500).send(err);
+  });
+});
+
+app.get('/twitter', (req, res) => {
+  twitter.requestToken().then((token) => {
+    twitter.requestUrl(token).then((response) => {
+      console.log(response);
+      res.status(200).send('worked');
+    }).catch((err) => {
+      console.error('failed to get url');
+      res.status(500).send(err);
+    });
+  }).catch((err) => {
+    console.error('failed to auth');
     res.status(500).send(err);
   });
 });
