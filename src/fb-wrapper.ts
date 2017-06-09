@@ -2,18 +2,17 @@ import request = require('request');
 
 import Code = require('./models/code');
 import Auth = require('./models/auth');
+import Config = require('./config');
 
-const baseUri = 'https://graph.facebook.com/v2.6/';
-const clientId = '';
-const clientSecret = '';
+const baseUri = Config.facebook.baseUri;
 
 class FbWrapper {
     private accessToken: string;
 
     public setAppToken(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            const uri = baseUri + 'oauth/access_token?client_id=' + clientId
-                + '&client_secret=' + clientSecret + '&grant_type=client_credentials';
+            const uri = baseUri + 'oauth/access_token?client_id=' + Config.facebook.clientId
+                + '&client_secret=' + Config.facebook.clientSecret + '&grant_type=client_credentials';
             request.get(uri , {
             }, (err, res, data) => {
                 if (err) {
