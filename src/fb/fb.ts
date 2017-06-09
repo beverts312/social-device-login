@@ -2,7 +2,7 @@ import request = require('request');
 
 import Code = require('./models/code');
 import Auth = require('./models/auth');
-import Config = require('./config');
+import Config = require('../config');
 
 const baseUri = Config.facebook.baseUri;
 
@@ -15,10 +15,10 @@ class FbWrapper {
                 + '&client_secret=' + Config.facebook.clientSecret + '&grant_type=client_credentials';
             request.get(uri , {
             }, (err, res, data) => {
-                if (err) {
-                    reject(err);
+                 if (res.statusCode !== 200) {
+                    reject(data);
                 }
-                this.accessToken = data.access_token;
+                this.accessToken = JSON.parse(data).access_token;
                 resolve(true);
             });
         });
@@ -33,8 +33,8 @@ class FbWrapper {
             request.post(baseUri + 'device/login_status', {
                 body: JSON.stringify(body)
             }, (err, res, data) => {
-                if (err) {
-                    reject(err);
+                if (res.statusCode !== 200) {
+                    reject(data);
                 }
                 resolve(JSON.parse(data));
             });
@@ -45,13 +45,14 @@ class FbWrapper {
         return new Promise<Code>((resolve, reject) => {
             const body = {
                 access_token: this.accessToken,
-                scope: scope
+                scope: scope,
+                redirect_uri: Config.facebook.redirectPath
             };
             request.post(baseUri + 'device/login', {
                 body: JSON.stringify(body)
             }, (err, res, data) => {
-                if (err) {
-                    reject(err);
+                if (res.statusCode !== 200) {
+                    reject(data);
                 }
                 resolve(JSON.parse(data));
             });
