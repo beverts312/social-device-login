@@ -12,39 +12,51 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/facebook', (req, res) => {
-  fb.setAppToken().then(() => {
-    fb.generateCode('publish_pages').then((code) => {
-      console.log('Enter the code ' + code.user_code + ' at ' + code.verification_uri);
-      fb.waitForAuth(code.code).then((auth) => {
-        res.status(200).send(JSON.stringify(auth));
+// tslint:disable-next-line:max-func-body-length
+Promise.all([fb.setAppToken(), twitter.setToken()]).then(() => {
+  app.get('/facebook', (req, res) => {
+    fb.setAppToken().then(() => {
+      fb.generateCode('publish_pages').then((code) => {
+        console.log('Enter the code ' + code.user_code + ' at ' + code.verification_uri);
+        fb.waitForAuth(code.code).then((auth) => {
+          res.status(200).send(JSON.stringify(auth));
+        }).catch((err) => {
+          console.error('failed to get auth token');
+          res.status(500).send(err);
+        });
       }).catch((err) => {
-        console.error('failed to get auth token');
+        console.error('failed to generate code');
         res.status(500).send(err);
       });
     }).catch((err) => {
-      console.error('failed to generate code');
+      console.error('failed to auth application');
       res.status(500).send(err);
     });
-  }).catch((err) => {
-    console.error('failed to auth application');
-    res.status(500).send(err);
   });
-});
 
-app.get('/twitter', (req, res) => {
-  twitter.requestToken().then((token) => {
-    twitter.requestUrl(token).then((response) => {
-      console.log(response);
-      res.status(200).send('worked');
+  app.get('/twitter/url', (req, res) => {
+    twitter.setToken().then(() => {
+      twitter.requestUrl().then((url) => {
+        res.status(200).send('Navigate to: ' + url +
+          ', authorize the app, and then send request an access token by passing the pin to /twitter/pin/{pin} on this server');
+      }).catch((err) => {
+        console.error('failed to get url');
+        res.status(500).send(err);
+      });
     }).catch((err) => {
-      console.error('failed to get url');
+      console.error('failed to auth');
       res.status(500).send(err);
     });
-  }).catch((err) => {
-    console.error('failed to auth');
-    res.status(500).send(err);
   });
-});
 
-app.listen(3000);
+  app.get('/twitter/pin/:pin', (req, res) => {
+    twitter.requestAccessToken(req.params.pin).then((response) => {
+      res.send(response);
+    });
+  });
+
+  app.listen(3000);
+  console.log('Webserver started');
+}).catch(() => {
+  console.error('Websever failed to start');
+});
