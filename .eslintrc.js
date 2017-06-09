@@ -39,7 +39,7 @@ module.exports = {
             'off'
         ],
         quotes: [
-            'error',
+            'warn',
             'single'
         ],
         semi: [

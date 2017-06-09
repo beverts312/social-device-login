@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     fb.generateCode('publish_pages').then((code) => {
       console.log('Enter the code ' + code.code + ' at ' + code.verification_uri);
       fb.waitForAuth(code.code).then((auth) => {
-        res.status(200).send(code);
+        res.status(200).send(JSON.stringify(auth));
       }).catch((err) => {
         res.status(500).send(err);
       });

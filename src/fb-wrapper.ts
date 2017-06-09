@@ -68,6 +68,7 @@ class FbWrapper {
                     resolve(auth);
                 }).catch((err) => {
                     console.log(err);
+                    reject(err);
                 });
             }, 5000);
         });
