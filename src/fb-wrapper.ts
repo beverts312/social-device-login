@@ -4,8 +4,8 @@ import Code = require('./models/code');
 import Auth = require('./models/auth');
 
 const baseUri = 'https://graph.facebook.com/v2.6/';
-const clientId = '1748405908799275';
-const clientSecret = '5261ad53530415fd44ce041852618148';
+const clientId = '';
+const clientSecret = '';
 
 class FbWrapper {
     private accessToken: string;
