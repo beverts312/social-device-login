@@ -10,10 +10,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => {
+app.get('/facebook', (req, res) => {
   fb.setAppToken().then(() => {
     fb.generateCode('publish_pages').then((code) => {
-      console.log('Enter the code ' + code.code + ' at ' + code.verification_uri);
+      console.log('Enter the code ' + code.user_code + ' at ' + code.verification_uri);
       fb.waitForAuth(code.code).then((auth) => {
         res.status(200).send(JSON.stringify(auth));
       }).catch((err) => {
